@@ -1,0 +1,1 @@
+My Goal here is to build a neural network from scratch and train it on youth slangs aka. brainrot. 
