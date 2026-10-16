@@ -1,6 +1,6 @@
-My Goal here is to build a neural network from scratch and train it on youth slangs aka. brainrot. 
+My Goal here is to build a neural network from scratch and train it on youth slangs aka. brainrot. I have never built a neural network, so my goal is to understand how it works. 
 
-After doing some research, I have categorized everthing into phases that needs to be done. 
+After doing some research, I have categorized everthing into phases that needs to be done. Some phases or the code of these phases are not necessary in the end, but they are important for the general understanding. 
 1. Autograd for scalars: A Value class that records every calculation in a computation graph and computes derivatives automatically using the chain rule. It can be used to train small neural network. 
 2. Tensor autograd with NumPy: Improve the autograd from single numbers to whole matrices, including matrix multiplication, broadcasting and a numerically stable softmax. 
 3. Network building blocks + MNIST: Code reusable layers, a loss function and optimizers. 
