@@ -29,18 +29,19 @@ class Value:
         out = Value(self.data * other.data, (self, other), op='*')
 
         def _backward():
-            self.grad += ...
-            other.grad += ...
+            self.grad += other.data * out.grad
+            other.grad += self.data * out.grad
+
         out._backward = _backward
+
         return out
 
     def __truediv__(self, other):
         pass
-
     
 
     def backward(self):
-        ...
+        visted = set()
 
 a = Value(3)
 b = Value(2)
