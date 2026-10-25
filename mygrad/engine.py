@@ -15,7 +15,7 @@ class Value:
         return f"Value: {self.data} Grad: {self.grad} Op: {self._op} Label: {self.label}"
 
     def __add__(self, other):
-
+        other = other if isinstance(other, Value) else Value(other)
         out = Value(self.data + other.data, (self, other), op='+')
 
         def _backward():
@@ -26,7 +26,11 @@ class Value:
 
         return out
 
+    def __radd__(self, other):
+        return self + Value(other)
+
     def __mul__(self, other):
+        other = other if isinstance(other, Value) else Value(other)
         out = Value(self.data * other.data, (self, other), op='*')
 
         def _backward():
@@ -36,6 +40,9 @@ class Value:
         out._backward = _backward
 
         return out
+
+    def __rmul__(self, other):
+        return self * Value(other)
 
     def __pow__(self, other):
         assert isinstance(other, (int, float)), "supports only int/float"
@@ -50,8 +57,8 @@ class Value:
 
     def tanh(self):
         x = self.data
-        t = (math.exp(2*x) - 1 / math.exp(2*x) + 1)
-        out = Value(t, (self, ), label='tanh')
+        t = (math.exp(2*x) - 1) / (math.exp(2*x) + 1)
+        out = Value(t, (self, ), op='tanh')
 
         def _backward():
             self.grad += (1 - t**2) * out.grad
@@ -86,21 +93,4 @@ class Value:
         for node in reversed(topo):
             node._backward()
         
-    
-h = 0.001
-a = Value(3, label='a')
 
-b = Value(2, label='b')
-c = Value(-2, label='c')
-e = a*b; e.label='e'
-d = e+c; d.label='d'
-f = Value(-5, label='f')
-L = d*f; L.label = 'L'
-L.backward()
-print(a)
-print(b)
-print(c)
-print(d)
-print(e)
-print(f)
-print(L)
