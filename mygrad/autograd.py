@@ -12,9 +12,10 @@ class Value:
         self.label = label
 
     def __repr__(self):
-        return f"Value: {self.data} Prev: {self._prev} Op: {self._op}"
+        return f"Value: {self.data} Grad: {self.grad} Op: {self._op} Label: {self.label}"
 
     def __add__(self, other):
+
         out = Value(self.data + other.data, (self, other), op='+')
 
         def _backward():
@@ -36,14 +37,60 @@ class Value:
 
         return out
 
+    def __pow__(self, other):
+        assert isinstance(other, (int, float)), "supports only int/float"
+        out = Value(self.data**other, (self,), f"**{other}")
+
+        def _backward():
+            self.grad += other * self.data ** (other-1) * out.grad
+        out._backward = _backward
+
     def __truediv__(self, other):
-        pass
+        return self * other**-1
+
+    def tanh(self):
+        x = self.data
+        t = (math.exp(2*x) - 1 / math.exp(2*x) + 1)
+        out = Value(t, (self, ), label='tanh')
+
+        def _backward():
+            self.grad += (1 - t**2) * out.grad
+
+        out._backward = _backward
+
+        return out
     
 
     def backward(self):
-        visted = set()
+        topo=[]
+        visited = set()
+        def build_topo(v):
+            if v not in visited:
+                visited.add(v)
+                for child in v._prev:
+                    build_topo(child)
+                topo.append(v)
+        build_topo(self)
 
-a = Value(3)
-b = Value(2)
-c = a + b
+        self.grad = 1.0
+        for node in reversed(topo):
+            node._backward()
+        
+    
+h = 0.001
+a = Value(3, label='a')
+
+b = Value(2, label='b')
+c = Value(-2, label='c')
+e = a*b; e.label='e'
+d = e+c; d.label='d'
+f = Value(-5, label='f')
+L = d*f; L.label = 'L'
+L.backward()
+print(a)
+print(b)
 print(c)
+print(d)
+print(e)
+print(f)
+print(L)
